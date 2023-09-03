@@ -111,9 +111,10 @@ export default function Usage({route}) {
       const displayData = new Array(7).fill(0);
       const currentDay = today.getDay()
       let x = today.getDay()
-
+      //current day = 20
+      //x = 20
       while (x >= 0) {
-        displayData[x] = data[today.getMonth() + 1][today.getDate() - (currentDay - x)].reduce((a, b) => a + b, 0);
+        displayData[x] = data[today.getMonth() + 1][today.getDate() - (currentDay - x)].reduce((a, b) => parseInt(a) + parseInt(b), 0);
         x--;
       }
       return displayData

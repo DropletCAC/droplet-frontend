@@ -14,4 +14,3 @@ web-build/
 .DS_Store
 
 credentials.json
-__pycache__/

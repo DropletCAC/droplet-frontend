@@ -52,7 +52,7 @@ export default function Home() {
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => navigation.navigate('Page2')}>
+                onPress={() => navigation.navigate('LeakDetection')}>
                 <Text style={styles.button_text}>Leak Detection</Text>
                 <View style={styles.icon}>
                   <Icon name="arrow-right" size={12} color="white"/>
