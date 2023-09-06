@@ -74,8 +74,9 @@ export default function Usage({route}) {
       while (currentMonth >= 1) {
         let total = 0;
         for (let day in data[currentMonth]) {
-          total += data[currentMonth][day].reduce((a, b) => a + b, 0);
+          total += data[currentMonth][day].reduce((a, b) => parseInt(a) + parseInt(b), 0);
         }
+        console.log(currentMonth - 1, total)
         displayData[currentMonth - 1] = total;
         currentMonth--;
       }

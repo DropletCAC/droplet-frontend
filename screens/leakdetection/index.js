@@ -1,365 +1,76 @@
 import * as React from 'react';
-import { TouchableOpacity, StyleSheet, View, Text, Button } from 'react-native';
-
-function euclideanDistance(point1, point2) {
-    let sum = 0;
-    for (let i = 0; i < point1.length; i++) {
-        sum += Math.pow(point1[i] - point2[i], 2);
-    }
-    return Math.sqrt(sum);
-}
-
-function calculateKDistance(data, pointIndex, k) {
-    const distances = data.map((_, i) => euclideanDistance(data[pointIndex], data[i]));
-    distances.sort((a, b) => a - b);
-    return distances[k];
-}
-
-function calculateReachabilityDistance(data, pointIndex, k) {
-    const kDistance = calculateKDistance(data, pointIndex, k);
-    const distances = data.map((_, i) => euclideanDistance(data[pointIndex], data[i]));
-    return Math.max(kDistance, distances[k]);
-}
-
-function calculateLRD(data, pointIndex, k) {
-    const reachabilityDistances = data.map((_, i) => calculateReachabilityDistance(data, i, k));
-    const lrd = k / reachabilityDistances.reduce((sum, distance) => sum + distance, 0);
-    return lrd;
-}
-
-function calculateLOF(data, pointIndex, k) {
-    const lrd = calculateLRD(data, pointIndex, k);
-    const neighborsLRD = data.map((_, i) => calculateLRD(data, i, k));
-    const lof = neighborsLRD.reduce((sum, neighborLRD) => sum + neighborLRD / lrd, 0) / k;
-    return lof;
-}
-
+import { View, ScrollView, StyleSheet, Image, Touchable, TouchableOpacity } from 'react-native';
+import { Text, Card, Button, Icon } from '@rneui/themed';
 // Sample data
-
-export default function LeakDetection() {
-    const data = [
-        [0,15],
-[1,15],
-[2,15],
-[3,15],
-[4,15],
-[5,15],
-[6,19],
-[7,10],
-[8,10],
-[9,42],
-[10,15],
-[11,6],
-[12,32],
-[13,16],
-[14,13],
-[15,19],
-[16,13],
-[17,12],
-[18,7],
-[19,10],
-[20,6],
-[21,1],
-[22,6],
-[23,0],
-[0,2],
-[1,2],
-[2,0],
-[3,3],
-[4,1],
-[5,11],
-[6,22],
-[7,8],
-[8,6],
-[9,42],
-[10,17],
-[11,9],
-[12,32],
-[13,17],
-[14,15],
-[15,21],
-[16,17],
-[17,12],
-[18,9],
-[19,6],
-[20,3],
-[21,3],
-[22,3],
-[23,0],
-[0,0],
-[1,3],
-[2,1],
-[3,4],
-[4,3],
-[5,7],
-[6,19],
-[7,9],
-[8,10],
-[9,39],
-[10,16],
-[11,6],
-[12,32],
-[13,16],
-[14,15],
-[15,22],
-[16,15],
-[17,14],
-[18,6],
-[19,10],
-[20,2],
-[21,2],
-[22,5],
-[23,0],
-[0,2],
-[1,4],
-[2,2],
-[3,3],
-[4,4],
-[5,8],
-[6,21],
-[7,8],
-[8,10],
-[9,42],
-[10,15],
-[11,8],
-[12,29],
-[13,17],
-[14,13],
-[15,21],
-[16,14],
-[17,16],
-[18,8],
-[19,8],
-[20,5],
-[21,0],
-[22,4],
-[23,3],
-[0,2],
-[1,1],
-[2,0],
-[3,3],
-[4,1],
-[5,10],
-[6,21],
-[7,10],
-[8,8],
-[9,40],
-[10,15],
-[11,9],
-[12,32],
-[13,17],
-[14,14],
-[15,22],
-[16,13],
-[17,12],
-[18,7],
-[19,7],
-[20,6],
-[21,1],
-[22,4],
-[23,2],
-[0,0],
-[1,0],
-[2,2],
-[3,5],
-[4,2],
-[5,9],
-[6,21],
-[7,8],
-[8,9],
-[9,41],
-[10,14],
-[11,9],
-[12,29],
-[13,17],
-[14,15],
-[15,22],
-[16,14],
-[17,15],
-[18,9],
-[19,6],
-[20,2],
-[21,4],
-[22,6],
-[23,1],
-[0,1],
-[1,2],
-[2,0],
-[3,4],
-[4,2],
-[5,11],
-[6,20],
-[7,11],
-[8,9],
-[9,40],
-[10,14],
-[11,8],
-[12,28],
-[13,16],
-[14,15],
-[15,22],
-[16,17],
-[17,14],
-[18,10],
-[19,10],
-[20,6],
-[21,1],
-[22,3],
-[23,1],
-[0,0],
-[1,0],
-[2,0],
-[3,1],
-[4,1],
-[5,11],
-[6,21],
-[7,10],
-[8,8],
-[9,39],
-[10,14],
-[11,9],
-[12,32],
-[13,18],
-[14,13],
-[15,20],
-[16,15],
-[17,14],
-[18,6],
-[19,10],
-[20,6],
-[21,4],
-[22,4],
-[23,2],
-[0,1],
-[1,2],
-[2,0],
-[3,3],
-[4,1],
-[5,10],
-[6,18],
-[7,12],
-[8,7],
-[9,42],
-[10,13],
-[11,7],
-[12,32],
-[13,17],
-[14,14],
-[15,19],
-[16,16],
-[17,16],
-[18,9],
-[19,9],
-[20,3],
-[21,2],
-[22,6],
-[23,0],
-[0,2],
-[1,1],
-[2,0],
-[3,3],
-[4,0],
-[5,7],
-[6,20],
-[7,8],
-[8,9],
-[9,39],
-[10,17],
-[11,9],
-[12,28],
-[13,20],
-[14,13],
-[15,23],
-[16,15],
-[17,15],
-[18,9],
-[19,10],
-[20,2],
-[21,2],
-[22,3],
-[23,1],
-[0,1],
-[1,4],
-[2,1],
-[3,1],
-[4,2],
-[5,10],
-[6,20],
-[7,10],
-[8,7],
-[9,42],
-[10,13],
-[11,10],
-[12,30],
-[13,19],
-[14,16],
-[15,20],
-[16,15],
-[17,16],
-[18,9],
-[19,10],
-[20,4],
-[21,2],
-[22,6],
-[23,2],
-[0,0],
-[1,3],
-[2,0],
-[3,2],
-[4,1],
-[5,8],
-[6,20],
-[7,8],
-[8,7],
-[9,39],
-[10,17],
-[11,6],
-[12,28],
-[13,20],
-[14,16],
-[15,20],
-[16,16],
-[17,12],
-[18,10],
-[19,10],
-[20,2],
-[21,1],
-[22,5],
-[23,0],
-[0,1],
-[1,1],
-[2,0],
-[3,1],
-[4,4],
-[5,7],
-[6,21],
-[7,11],
-[8,7],
-[9,39],
-[10,17],
-[11,7],
-[12,31],
-[13,19],
-[14,13],
-[15,21],
+const users = [
+    {
+      name: 'brynn',
+      avatar: 'https://uifaces.co/our-content/donated/1H_7AxP0.jpg',
+    },
+    {
+      name: 'thot leader',
+      avatar:
+        'https://images.pexels.com/photos/598745/pexels-photo-598745.jpeg?crop=faces&fit=crop&h=200&w=200&auto=compress&cs=tinysrgb',
+    },
+    {
+      name: 'jsa',
+      avatar: 'https://uifaces.co/our-content/donated/bUkmHPKs.jpg',
+    },
+    {
+      name: 'talhaconcepts',
+      avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
+    },
+    {
+      name: 'andy vitale',
+      avatar: 'https://uifaces.co/our-content/donated/NY9hnAbp.jpg',
+    },
+    {
+      name: 'katy friedson',
+      avatar:
+        'https://images-na.ssl-images-amazon.com/images/M/MV5BMTgxMTc1MTYzM15BMl5BanBnXkFtZTgwNzI5NjMwOTE@._V1_UY256_CR16,0,172,256_AL_.jpg',
+    },
     ];
     
-    const k = 3; // Number of neighbors
-    
-    const outliers = [];
-    for (let i = 0; i < data.length; i++) {
-        const lof = calculateLOF(data, i, k);
-        console.log(lof)
-        if (lof > threshold) {
-            outliers.push({ index: i, lof });
-        }
-    }
-    
-    console.log('Outliers:', outliers);
-    
+export default function LeakDetection() {
     return (
-        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-            <Text>Test</Text>
+        <View style={{marginTop: 50}}>
+            <Card>
+                <Card.Title>Leak Detected</Card.Title>
+                <Card.Divider />
+                <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                    <Text>Word</Text>
+                    <TouchableOpacity>
+                        <Text>Dismiss</Text>
+                    </TouchableOpacity>
+                </View>
+            </Card>
+            <Card>
+                <Card.Title>Leak Detected</Card.Title>
+                <Card.Divider />
+               <Text>Word</Text>
+            </Card>
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    fonts: {
+      marginBottom: 8,
+    },
+    user: {
+      flexDirection: 'row',
+      marginBottom: 6,
+    },
+    image: {
+      width: 30,
+      height: 30,
+      marginRight: 10,
+    },
+    name: {
+      fontSize: 16,
+      marginTop: 5,
+    },
+    });
