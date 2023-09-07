@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import { TouchableOpacity, StyleSheet, View, Text, Dimensions } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { VictoryPie, VictoryLabel } from 'victory-native';
@@ -9,6 +9,9 @@ import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import { BarChart } from "react-native-chart-kit";
 import { Foundation, Feather } from '@expo/vector-icons'; 
+import * as Device from 'expo-device';
+import Constants from "expo-constants";
+import * as Notifications from 'expo-notifications';
 
 //const graphicColor = ["tomato", "yellow"]
 ; // Colors
@@ -39,13 +42,62 @@ export default function Home() {
   const [graphicData, setGraphicData] = useState(defaultGraphicData);
   const [graphicColor, setGraphicColor] = useState([])
   const [data, setData] = useState({})
+  const [meters, setMeters] = useState([])
+  const [meterData, setMeterData] = useState([])
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+  
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      console.log("poooo" + JSON.stringify(Constants.expoConfig.extra.eas.projectId))
+      token = await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig.extra.eas.projectId,
+      });
+      console.log(token);
+
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .update({
+          expoPushToken: token['data'],
+        })
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+  
+    return token;
+  }
 
   useEffect(() => {
     
     const calculateAverage = async() => {
       const snap = await getData()
       const data = snap.data()
-      console.log("poop", snap.data())
+
       let days = 0
       let total = 0
       for (const [month, month_data] of Object.entries(data)) {
@@ -56,11 +108,12 @@ export default function Home() {
       }
 
       const daily_avg = Math.round(total/days)
+      today_total = data[today.getMonth() + 1][today.getDate()].reduce((a, b) => parseInt(a) + parseInt(b), 0)
 
-      //const today_total = data[today.getMonth() + 1][today.getDate()].reduce((a, b) => parseInt(a) + parseInt(b), 0)
-      const today_total=300
-      console.log(today_total)
-      
+      // console.log(today.getMonth() + 1, today.getDate());
+      // console.log(data[today.getMonth() + 1][today.getDate()]);
+      // console.log(today_total, daily_avg);
+
       const graphicData = []
 
       if (today_total < daily_avg) {
@@ -70,13 +123,59 @@ export default function Home() {
         graphicData.push({ y: ((today_total/daily_avg) - 1) * 100}, { y: 100})
         setGraphicColor(["tomato", '#388087'])
       }
-
-      console.log(daily_avg)
       setGraphicData(graphicData);
+
+      registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+      });
+  
+      responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+      });
+  
+      return () => {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+        Notifications.removeNotificationSubscription(responseListener.current);
+      };
 
     }
     
+    const calculateMeters = async() => {
+      const querySnapshot = await getMeters()
+      const newMeters = []
+      const newData = []
+
+      querySnapshot.forEach(async (doc) => {
+        newMeters.push(doc.id)
+      });
+
+      for (const meter of newMeters) {
+          const snap = await firebase 
+            .firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("meters")
+            .doc(meter)
+            .collection("usage")
+            .doc(today.getFullYear().toString())
+            .get()
+
+          const data = snap.data()
+          const todayData = data[today.getMonth() + 1][today.getDate()].reduce((a, b) => parseInt(a) + parseInt(b), 0)
+          newData.push(todayData)
+      }
+
+      setMeters(newMeters)
+      setMeterData(newData)
+    }
+
+
     calculateAverage()
+      .catch(console.error)
+    
+    calculateMeters()
       .catch(console.error)
   }, []);
 
@@ -91,10 +190,20 @@ export default function Home() {
     .get()
   }
 
+  async function getMeters() {
+    return await firebase 
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("meters")
+      .get()
+  }
+
   async function handleUsage() {
     snap = await getData()
     navigation.navigate("Usage", {"data": snap.data()})
   }
+
 
   return (
       <View style={styles.container}>
@@ -124,10 +233,10 @@ export default function Home() {
 
         <BarChart
             data={{
-              labels: ["Bathroom", "Lawn", "Fountain"],
+              labels: meters,
               datasets: [
                 {
-                  data: [20, 45, 28]
+                  data: meterData,
                 }
               ]
             }}

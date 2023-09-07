@@ -11,8 +11,6 @@ const styles = StyleSheet.create({
       flex: 3,
       justifyContent: 'center',
       alignItems: 'center',
-      margin: 10,
-      marginRight: 15,
       marginTop: 50,
     },
   

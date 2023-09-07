@@ -77,7 +77,6 @@ export default function Usage({route}) {
         for (let day in data[currentMonth]) {
           total += data[currentMonth][day].reduce((a, b) => parseInt(a) + parseInt(b), 0);
         }
-        console.log(currentMonth - 1, total)
         displayData[currentMonth - 1] = total;
         currentMonth--;
       }
@@ -182,8 +181,6 @@ export default function Usage({route}) {
 
     labels = labels.map(convert24to12)
     labels[5] = (today.toLocaleTimeString(undefined, {hour: '2-digit', minute: '2-digit'}))
-
-    console.log(last6Hours)
     
     return (
     <LineChart
@@ -204,6 +201,7 @@ export default function Usage({route}) {
           chartConfig={chartConfig("255")}
           bezier
           style={styles.graph}
+          fromZero={true}
         />)
   }
 
