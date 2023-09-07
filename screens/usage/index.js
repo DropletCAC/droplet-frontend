@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { TouchableOpacity, StyleSheet, View, Text, Button, Dimensions} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { BarChart, LineChart } from "react-native-chart-kit";
@@ -9,6 +9,7 @@ import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import styles from "./styles"
 
+const height = 750;
 
 export default function Usage({route}) {
   const params = route.params 
@@ -96,7 +97,7 @@ export default function Usage({route}) {
         }}
         chartConfig={chartConfig("0")}
         width={Dimensions.get("window").width - 20} 
-        height={600}
+        height={height}
         yAxisSuffix=" gal"
         withInnerLines={false}
         withOuterLines={false}
@@ -133,7 +134,7 @@ export default function Usage({route}) {
         }}
         chartConfig={chartConfig("0")}
         width={Dimensions.get("window").width - 20} 
-        height={600}
+        height={height}
         yAxisSuffix=" gal"
         withInnerLines={false}
         withOuterLines={false}
@@ -195,7 +196,7 @@ export default function Usage({route}) {
             ]
           }}
           width={Dimensions.get("window").width} 
-          height={600}
+          height={height}
           xAxisSuffix="PM"
           yAxisSuffix=" gal"
           withInnerLines={false}

@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       margin: 10,
       marginRight: 15,
+      marginTop: 50,
     },
   
     header: {
