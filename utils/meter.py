@@ -8,6 +8,7 @@ from datetime import datetime
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-e', '--emulator', action='store_true')
+parser.add_argument('-s', '--section')
 args = parser.parse_args()
 
 if args.emulator:
@@ -76,6 +77,7 @@ if __name__ == "__main__":
     if args.emulator:
         print("Starting in emulator mode...")
 
-    Meter("BwyZV2GQN0O1DVDsGl4BAj9W5q92", name="bathroom")
+    print("Starting in", args.section)
+    Meter("BwyZV2GQN0O1DVDsGl4BAj9W5q92", name=args.section)
             
     

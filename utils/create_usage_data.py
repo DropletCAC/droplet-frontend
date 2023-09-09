@@ -4,9 +4,11 @@ import random
 import os 
 
 from datetime import datetime
-today = datetime.today()
+today = datetime.now()
 month = int(today.strftime("%m"))
 day = int(today.strftime("%d"))
+hour = int(today.strftime("%H"))
+print(hour)
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -128,13 +130,13 @@ def generateHourlyUsage(hour):
     
     return str(max(0, usages[hour] + random.randint(-2, 2)))
 
-def generateDailyUsage():
+def generateDailyUsage(stop=24):
   day = []
-  for hour in range(0, 24):
+  for hour in range(0, stop):
     day.append(generateHourlyUsage(hour))
   return day
 
-def generateData(stop_month, stop_day):
+def generateData(stop_month, stop_day, stop_hour):
   usage_data = {}
 
   for month_name in month_data:
@@ -143,10 +145,17 @@ def generateData(stop_month, stop_day):
       usage_data[month_num] = {}
           
       for day in range(1, month_data[month_name]['days']):
-        if ((month_data[month_name]['number'] == stop_month) and day == stop_day + 1):
-          return usage_data
+
+        if (month_data[month_name]['number'] == stop_month):
+          if (day == stop_day):
+            day = str(day)
+            usage_data[month_num][day] = generateDailyUsage(stop=stop_hour)
+            continue
+          
+          if (day == stop_day + 1):
+            return usage_data
+          
         day = str(day)
-        
         usage_data[month_num][day] = generateDailyUsage()
           
   return usage_data
@@ -188,6 +197,6 @@ if __name__ == "__main__":
   #   "currentUsage": "0",
   # })
 
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("usage").document("2023").set(generateData(month, day))  
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("bathroom").collection("usage").document("2023").set(generateData(month, day))
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("lawn").collection("usage").document("2023").set(generateData(month, day))
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("usage").document("2023").set(generateData(month, day ,hour))  
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("bathroom").collection("usage").document("2023").set(generateData(month, day, hour))
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("lawn").collection("usage").document("2023").set(generateData(month, day, hour))

@@ -51,12 +51,12 @@ export default function LeakDetection() {
 
     const Item = ({data}) => (
       <View>
-        <Card>
+        <Card containerStyle={styles.item}>
             <Card.Title>Leak Detected</Card.Title>
             <Card.Divider />
             <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
               <View>
-                <Text>Leak detected in "{data.section}"</Text>
+                <Text>Leak Detected In: "{data.section}"</Text>
                 <Text>On {data.date.toLocaleString("en-GB")}</Text>
                 <Text>Used {data.usage} gallons</Text>
               </View>
