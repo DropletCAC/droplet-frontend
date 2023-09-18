@@ -3,17 +3,19 @@ from firebase_admin import credentials, firestore
 import random 
 import os 
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('-e', '--emulator', action='store_true')
+parser.add_argument('-c', '--current', action='store_true')
+args = parser.parse_args()
+
+
 from datetime import datetime
 today = datetime.now()
 month = int(today.strftime("%m"))
 day = int(today.strftime("%d"))
-hour = int(today.strftime("%H"))
+hour = int(today.strftime("%H")) + 1 if args.current else int(today.strftime("%H"))
 print(hour)
-
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('-e', '--emulator', action='store_true')
-args = parser.parse_args()
 
 if args.emulator:
   print("Starting in emulator mode...")

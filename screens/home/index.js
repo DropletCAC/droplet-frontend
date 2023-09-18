@@ -123,6 +123,7 @@ export default function Home() {
         graphicData.push({ y: ((today_total/daily_avg) - 1) * 100}, { y: 100})
         setGraphicColor(["tomato", '#388087'])
       }
+      
       setGraphicData(graphicData);
 
       registerForPushNotificationsAsync().then(token => setExpoPushToken(token));

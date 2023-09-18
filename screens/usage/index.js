@@ -8,6 +8,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import styles from "./styles"
+import { Ionicons } from '@expo/vector-icons'; 
 
 const height = 750;
 
@@ -75,7 +76,7 @@ export default function Usage({route}) {
       while (currentMonth >= 1) {
         let total = 0;
         for (let day in data[currentMonth]) {
-          total += data[currentMonth][day].reduce((a, b) => parseInt(a) + parseInt(b), 0);
+          total += data[currentMonth][day].reduce((a, b) => parseInt(a) || 0 + parseInt(b) || 0, 0);
         }
         displayData[currentMonth - 1] = total;
         currentMonth--;
@@ -174,7 +175,7 @@ export default function Usage({route}) {
     let labels = genLabels()
 
     function addLabel(value) {
-      last6Hours.push(displayData[value])
+      last6Hours.push(displayData[value] || 0)
     }
     labels.forEach(addLabel)
 
@@ -208,11 +209,11 @@ export default function Usage({route}) {
   function getMessage() {
     switch (dropDownValue) {
       case "today":
-        return "Usage for " + today.toDateString();
+        return "Today's Usage";
       case "week": 
-        return "Usage for this week";
+        return "This Week's Usage";
       case "year":
-        return "Usage for " + today.getFullYear();
+        return today.getFullYear() + "'s Usage";
     }
   };
 
@@ -238,13 +239,18 @@ export default function Usage({route}) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <View>
+          <View style={{flex: 1}}>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                <Ionicons name="chevron-back" size={24} color="white" />
+              </TouchableOpacity>
+          </View>
+          <View style={{flex: 1.1}}>
             <Text style={{color: 'white'}}>{getMessage()}</Text>
           </View>
-          <View>
+          <View style={{flex: 1}}>
             <DropDownPicker
-              style={{backgroundColor: "rgb(22, 23, 24", color: "rgb(22, 23, 24", maxWidth: 100, marginRight: 50}}
-              textStyle={{color: "white", justifyContent: "center", alignContent: "center"}}
+              style={{backgroundColor: "rgb(22, 23, 24", color: "rgb(22, 23, 24)", maxWidth: "80%", marginLeft: 30, justifyContent: "center"}}
+              textStyle={{color: "white"}}
               dropDownContainerStyle={{backgroundColor: "rgb(22, 23, 24"}}
               open={open}
               value={dropDownValue}

@@ -18,10 +18,10 @@ const styles = StyleSheet.create({
       backgroundColor: "rgb(22, 23, 24)",
       alignItems: 'center',
       justifyContent: 'space-between',
-      zIndex: 1,
       flexDirection: "row",
-      marginTop: 50,
+      marginTop: 20,
       flex: 0.5,
+      zIndex: 1,
     },
   
     text: {

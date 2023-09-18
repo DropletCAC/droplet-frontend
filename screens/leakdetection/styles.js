@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
     
     list: {
         flex: 1,
-        marginTop: 50, 
     },
 
     text: {
@@ -26,7 +25,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'gray',
         height: 1,
       },
-  
+    
+    header: {
+        flex: 0.05,
+        flexDirection: "row", 
+        justifyContent: "space-between", 
+        marginTop: 50, 
+        alignContent: 'center',   
+    }
   })
   
 export default styles;

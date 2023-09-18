@@ -6,10 +6,12 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import styles from "./styles"
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from '@expo/vector-icons'; 
 
 export default function LeakDetection() {
-
-    [leaks, setLeaks] = useState([])
+    const navigation = useNavigation()
+    const [leaks, setLeaks] = useState([])
 
     useEffect(() => {
       const unsubscribe =
@@ -53,7 +55,6 @@ export default function LeakDetection() {
       <View>
         <Card containerStyle={styles.item}>
             <Card.Title>Leak Detected</Card.Title>
-            <Card.Divider />
             <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
               <View>
                 <Text>Leak Detected In: "{data.section}"</Text>
@@ -74,10 +75,23 @@ export default function LeakDetection() {
     if (leaks) {
       return (
         <View style={styles.container}>
+          <View style={styles.header}>
+            <View style={{flex: 1, justifyContent: "center", alignItems: "flex-start", marginLeft: 10}}>
+                  <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                    <Ionicons name="chevron-back" size={24} color="white" />
+                  </TouchableOpacity>
+              </View>
+
+              <View style={{flex: 2, alignItems: "center", justifyContent: "center"}}>
+                <Text style={{color: "white"}}>Leaks</Text>
+              </View>
+
+              <View style={{flex: 1}} />
+
+          </View>
             <FlatList style={styles.list}
                 data={leaks}
                 renderItem={({item}) => <Item data={item} />}
-                ItemSeparatorComponent={() => <View style={styles.item_seperator}/>}
             />
         </View>
        )

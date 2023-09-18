@@ -8,10 +8,10 @@ import "firebase/compat/firestore";
 
 
 export default function TestPage({route}) {
-    const params = route.params
+    
     return (
         <View>
-            <Text>{JSON.stringify(params)}</Text>
+            <Text>Hi</Text>
         </View>
     )
 }
