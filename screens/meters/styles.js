@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     },
     
     list: {
-        flex: 0.9,
+      marginTop: 10,
     },
     
     meter_pressable: {

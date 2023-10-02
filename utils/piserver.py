@@ -1,15 +1,11 @@
-from flask import Flask, request
-import firebase_admin
-from firebase_admin import credentials, firestore 
+from flask import Flask, request 
 import json
 import RPi.GPIO as GPIO
 import time, sys, os
 from datetime import datetime 
 import threading 
-
-cred = credentials.Certificate("credentials.json")
-default_app = firebase_admin.initialize_app(cred)
-db = firestore.client()
+import numpy as np
+import requests
 
 app = Flask(__name__)
 
@@ -20,11 +16,10 @@ class Meter:
         self.start_counter = 0
         self.user_id = user_id
         self.section = section 
-
+        self.total = 0
+        
     def send(self, gal):
-        db.collection("users").document(self.user_id).collection("meters").document(self.section).set({
-            "currentUsage": gal, 
-        })
+        requests.post(f"https://bengal-sought-bedbug.ngrok-free.app/setCurrentUsage?user={self.user_id}&section={self.section}&usage={gal}")
 
     def countPulse(self, channel):
         if self.start_counter == 1:
@@ -42,26 +37,41 @@ class Meter:
 
         while True:
             try:                
-                start_counter = 1
-                print("Starting counter...")
-                time.sleep(60)
-                print("Calculating")
-                start_counter = 0
-                flow = (count / 7.5) # Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
-                gal = flow / 3.785
+                # start_counter = 1
+                # print("Starting counter...")
+                # time.sleep(1)
+                # print("Calculating")
+                # start_counter = 0
+                # flow = (self.count / 7.5) # Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
+                # print(self.count, flow)
+                # gal = flow / 3.785
 
-                message = f"Flow Rate: {flow} L/min | {gal} gal/min"
-                print(message)
+                # message = f"Flow Rate: {flow} L/min | {gal} gal/min"
+                # print(message)
 
-                self.count = 0
+                # self.count = 0
+                # time.sleep(5)
+                x = 0
+                flows = []
+                while (x < 60):
+                    self.start_counter = 1
+                    time.sleep(1)
+                    self.start_counter = 0
+                    flows.append(self.count / 7.5 / 3.785) # Pulse frequency (Hz) = 7.5Q, Q is flow rate in L/min.
+                    print("The flow is: %.3f gal/min" % (flows[-1]), x)
+                    self.count = 0
+                    if flows[-1] > 0:
+                        x += 1
+
+                flows = np.array(flows)
+                avg_flow = np.mean(flows)
+                print("AVG FLOW", avg_flow)
+                self.send(avg_flow)
+                
             except KeyboardInterrupt:
                 print('\nkeyboard interrupt!')
                 GPIO.cleanup()
                 sys.exit()
-
-
-        def send(message):
-            print("Sending")
 
 
 @app.route('/setup', methods=['GET'])

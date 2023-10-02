@@ -200,5 +200,9 @@ if __name__ == "__main__":
   # })
 
   db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("usage").document("2023").set(generateData(month, day ,hour))  
+  
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("bathroom").set({"currentUsage": 0})
   db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("bathroom").collection("usage").document("2023").set(generateData(month, day, hour))
+  
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("lawn").set({"currentUsage": 0})
   db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("lawn").collection("usage").document("2023").set(generateData(month, day, hour))

@@ -13,6 +13,7 @@ const port = 8080
 export default function Meters() {
     const navigation = useNavigation()
     const [meters, setMeters] = useState([])
+    const [buckets, setBuckets] = useState([])
     const today = new Date();
     const [addMeterVisible, setAddMeterVisible] = useState(false)
     const [deviceName, onChangeText] = useState('raspberrypi.local');
@@ -51,23 +52,45 @@ export default function Meters() {
     useEffect(() => {
       const unsubscribe =
         firebase
+            .firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("buckets")
+            .onSnapshot(querySnapshot => {
+              const newBuckets = []
+
+              querySnapshot.forEach(documentSnapshot => {
+                console.log(documentSnapshot.data())
+                newBuckets.push({
+                  key: documentSnapshot.id,
+                  currentLevel: documentSnapshot.data()['currentLevel'],
+                  totalCapacity: documentSnapshot.data()['totalCapacity'],
+                })
+              })
+            
+              setBuckets(newBuckets)
+        
+        })
+
+        
+        firebase
           .firestore()
           .collection("users")
           .doc(firebase.auth().currentUser.uid)
           .collection("meters")
           .onSnapshot(querySnapshot => {
-            const newDocs = []
+            const newMeters = []
 
             querySnapshot.forEach(documentSnapshot => {
               console.log(documentSnapshot.data())
-              newDocs.push({
+              newMeters.push({
                 key: documentSnapshot.id,
                 usage: documentSnapshot.data()['currentUsage'],
               })
             })
 
-            setMeters(newDocs)
-          })
+            setMeters(newMeters)
+        })
       
 
 
@@ -76,8 +99,25 @@ export default function Meters() {
       }
     }, []);
     
-    
-    const Item = ({data}) => (
+        
+    const Bucket = ({data}) => (
+      <Pressable
+        style={({ pressed }) => [
+          { backgroundColor: pressed ? 'rgb(30, 30, 30)' : 'rgb(22, 23, 24)' },
+          styles.meter_pressable
+        ]}
+        onPress={() => handleUsage(data)}>
+        
+        
+        <Text style={styles.text}>{data.key}</Text>
+
+        <Text style={styles.text}>{data.currentLevel} gal</Text>
+      </Pressable>
+
+
+    );
+
+    const Meter = ({data}) => (
         <Pressable
           style={({ pressed }) => [
             { backgroundColor: pressed ? 'rgb(30, 30, 30)' : 'rgb(22, 23, 24)' },
@@ -149,12 +189,24 @@ export default function Meters() {
           </View>
 
           <View style={styles.list}>
+            <FlatList
+                  data={meters}
+                  renderItem={({item}) => <Meter data={item} />}
+                  ItemSeparatorComponent={() => <View style={styles.item_seperator}/>}
+              />
+          </View>
+
+          
+          <View style={{alignItems: "center", justifyContent: "center", marginTop: 20}}>
+              <Text style={{color: "white"}}>Buckets</Text>
+          </View>
+
+
           <FlatList
-                data={meters}
-                renderItem={({item}) => <Item data={item} />}
+                data={buckets}
+                renderItem={({item}) => <Bucket data={item} />}
                 ItemSeparatorComponent={() => <View style={styles.item_seperator}/>}
             />
-          </View>
         </View>
     )
 }

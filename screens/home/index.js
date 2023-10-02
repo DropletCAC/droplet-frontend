@@ -148,7 +148,7 @@ export default function Home() {
       const newMeters = []
       const newData = []
 
-      querySnapshot.forEach(async (doc) => {
+      querySnapshot.forEach((doc) => {
         newMeters.push(doc.id)
       });
 
@@ -209,7 +209,7 @@ export default function Home() {
   return (
       <View style={styles.container}>
          <View style={{justifyContent: "space-between", flexDirection: "row", flex: (1), marginTop: 50}}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Tips")}>
               <Foundation name="lightbulb" size={25} color="white" />
             </TouchableOpacity>
 
@@ -233,6 +233,7 @@ export default function Home() {
          />
 
         <BarChart
+          style={{marginLeft: 20}}
             data={{
               labels: meters,
               datasets: [
@@ -247,8 +248,9 @@ export default function Home() {
             withInnerLines={false}
             withOuterLines={false}
             fromZero={true}
-            withHorizontalLabels={false}
+            withHorizontalLabels={true}
             withVerticalLabels={true}
+            yAxisSuffix=" gal"
           />
         </View>
         

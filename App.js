@@ -8,6 +8,7 @@ import Home from "./screens/home";
 import AuthScreen from "./screens/auth";
 import TestPage from './screens/test';
 import LeakDetection from './screens/leakdetection';
+import Tips from "./screens/tips";
 import * as Notifications from 'expo-notifications';
 import firebase from "firebase/compat/app";
 
@@ -49,6 +50,7 @@ function App() {
         <Stack.Screen name="Meters" component={Meters} options={{ headerShown: false}} />
         <Stack.Screen name="TestPage" component={TestPage} options={{ headerShown: false}} />
         <Stack.Screen name="LeakDetection" component={LeakDetection} options={{ headerShown: false}} />
+        <Stack.Screen name="Tips" component={Tips} options={{ headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

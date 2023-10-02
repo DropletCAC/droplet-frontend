@@ -58,8 +58,12 @@ export default function LeakDetection() {
             <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
               <View>
                 <Text>Leak Detected In: "{data.section}"</Text>
-                <Text>On {data.date.toLocaleString("en-GB")}</Text>
-                <Text>Used {data.usage} gallons</Text>
+                <Text>On {data.date.toLocaleString([], { dateStyle: 'long', timeStyle: 'short' })}</Text>
+                <Text>
+                  <Text>Unusual usage of </Text>
+                  <Text style={{fontWeight: "bold"}}>{data.usage}</Text>
+                  <Text> gallons</Text>
+                </Text>
               </View>
 
                 <TouchableOpacity onPress={() => deleteLeak(data)}>
