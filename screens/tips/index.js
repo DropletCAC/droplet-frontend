@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 export default function Tips({route}) {
     const [tips, setTips] = useState([])
     const navigation = useNavigation()
-    
+
     useEffect(() => {
         const unsubscribe =
           firebase
@@ -56,7 +56,7 @@ export default function Tips({route}) {
           <Card containerStyle={styles.item}>
             <View>
                 <Text style={{fontSize: 15}}>{data.content}</Text>
-                <View style={{justifyContent: "space-between", flexDirection: "row", marginTop: 5}}>
+                <View style={styles.item_footer}>
                     <Text style={{fontSize: 12}}>{data.date.toDateString()}</Text>
                         <TouchableOpacity onPress={() => deleteTip(data)}>
                         <Text style={{fontSize: 12}}>Dismiss</Text>
@@ -73,13 +73,13 @@ export default function Tips({route}) {
         return (
           <View style={styles.container}>
             <View style={styles.header}>
-              <View style={{flex: 1, justifyContent: "center", alignItems: "flex-start", marginLeft: 10}}>
+              <View style={styles.back_button}>
                     <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                       <Ionicons name="chevron-back" size={24} color="white" />
                     </TouchableOpacity>
                 </View>
   
-                <View style={{flex: 2, alignItems: "center", justifyContent: "center"}}>
+                <View style={styles.header_text}>
                   <Text style={{color: "white"}}>Tips</Text>
                 </View>
   

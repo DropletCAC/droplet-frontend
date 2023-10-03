@@ -15,23 +15,36 @@ const styles = StyleSheet.create({
     },
     
     item: {
-        borderRadius: 10,
-        borderWidth: 10,  
-        backgroundColor: "white",
-        borderColor: "white", 
+        borderRadius: 15,
+        backgroundColor: "rgb(220, 220, 220)",
+        borderWidth: 0,
     },
 
-    item_seperator: {
-        backgroundColor: 'gray',
-        height: 1,
-      },
-    
+    inner_item: {
+        flexDirection: "row",
+        justifyContent: "space-between", 
+        alignItems: "center"
+    },
+
     header: {
         flex: 0.05,
         flexDirection: "row", 
         justifyContent: "space-between", 
         marginTop: 50, 
         alignContent: 'center',   
+    },
+
+    header_text: {
+        flex: 2, 
+        alignItems: "center", 
+        justifyContent: "center"
+    },
+
+    back_button: {
+        flex: 1, 
+        justifyContent: "center", 
+        alignItems: "flex-start", 
+        marginLeft: 10
     }
   })
   

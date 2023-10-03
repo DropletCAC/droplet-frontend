@@ -9,13 +9,19 @@ const styles = StyleSheet.create({
     list: {
         flex: 1,
     },
+
     item: {
         borderRadius: 15,
-        backgroundColor: "white",
-        borderColor: "white", 
+        backgroundColor: "rgb(220, 220, 220)",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center"
+    },
+    
+    item_footer: {
+        justifyContent: "space-between", 
+        flexDirection: "row", 
+        marginTop: 5
     },
     
     header: {
@@ -24,6 +30,19 @@ const styles = StyleSheet.create({
         justifyContent: "space-between", 
         marginTop: 50, 
         alignContent: 'center',   
+    },
+
+    back_button: {
+        flex: 1,
+        justifyContent: "center", 
+        alignItems: "flex-start", 
+        marginLeft: 10
+    },
+
+    header_text: {
+        flex: 2, 
+        alignItems: "center", 
+        justifyContent: "center"
     }
   })
   

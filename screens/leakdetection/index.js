@@ -55,7 +55,7 @@ export default function LeakDetection() {
       <View>
         <Card containerStyle={styles.item}>
             <Card.Title>Leak Detected</Card.Title>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+            <View style={styles.inner_item}>
               <View>
                 <Text>Leak Detected In: "{data.section}"</Text>
                 <Text>On {data.date.toLocaleString([], { dateStyle: 'long', timeStyle: 'short' })}</Text>
@@ -80,13 +80,13 @@ export default function LeakDetection() {
       return (
         <View style={styles.container}>
           <View style={styles.header}>
-            <View style={{flex: 1, justifyContent: "center", alignItems: "flex-start", marginLeft: 10}}>
+            <View style={styles.back_button}>
                   <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                     <Ionicons name="chevron-back" size={24} color="white" />
                   </TouchableOpacity>
               </View>
 
-              <View style={{flex: 2, alignItems: "center", justifyContent: "center"}}>
+              <View style={styles.header_text}>
                 <Text style={{color: "white"}}>Leaks</Text>
               </View>
 
