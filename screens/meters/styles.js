@@ -34,8 +34,10 @@ const styles = StyleSheet.create({
       },
 
       modalView: {
+        alignItems: "center",
+        justifyContent: 'center',
         margin: 20,
-        backgroundColor: 'white',
+        backgroundColor: 'rgb(220, 220, 220)',
         borderRadius: 20,
         padding: 35,
         paddingHorizontal: 100,
@@ -47,6 +49,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
+        width: "90%"
       },
 
       button: {
@@ -72,6 +75,9 @@ const styles = StyleSheet.create({
       
       modalText: {
         textAlign: 'center',
+        fontSize: 16,
+        marginTop: 10,
+        margin: 10
       },
 
       header: {
@@ -80,6 +86,25 @@ const styles = StyleSheet.create({
         justifyContent: "space-between", 
         marginTop: 50, 
         alignContent: 'center',   
+    },
+
+    dropdown: {
+      backgroundColor: "rgb(220, 220, 220)",
+      marginBottom: 10
+    },
+
+    textInput: {
+      padding: 15,
+      textDecorationLine: "underline", 
+      borderWidth: 1, 
+      borderRadius: 10
+    },
+
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "center", 
+      alignItems: "center", 
+      marginTop: 10
     }
 })
 

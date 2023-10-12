@@ -88,15 +88,15 @@ export default function Usage({route}) {
     return (
       <BarChart
         data={{
-          labels: months,
+          labels: months.slice(0, 6),
           datasets: [
             {
-              data: getYearData(),
+              data: getYearData().slice(0, 6),
             }
           ]
         }}
         chartConfig={chartConfig("0")}
-        width={Dimensions.get("window").width - 20} 
+        width={Dimensions.get("window").width - 50} 
         height={height}
         yAxisSuffix=" gal"
         withInnerLines={false}

@@ -7,16 +7,30 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import { Entypo, Feather, Ionicons } from '@expo/vector-icons'; 
+import DropDownPicker from 'react-native-dropdown-picker';
+import { Dimensions } from 'react-native';
+
 
 const port = 8080
 
 export default function Meters() {
+    const windowWidth = Dimensions.get('window').width;
+    const windowHeight = Dimensions.get('window').height;
     const navigation = useNavigation()
     const [meters, setMeters] = useState([])
     const [buckets, setBuckets] = useState([])
     const today = new Date();
     const [addMeterVisible, setAddMeterVisible] = useState(false)
-    const [deviceName, onChangeText] = useState('raspberrypi.local');
+    const [deviceName, onChangeDeviceName] = useState('raspberrypi');
+    const [radius, onChangeRadius] = useState();
+    const [height, onChangeHeight] = useState();
+    const [nickname, onChangeNickName] = useState();
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [dropdownValue, setDropdownValue] = useState(null);
+    const [dropdownItems, setDropdownItems] = useState([
+      {label: 'Smart Meter', value: 'meter'},
+      {label: 'Smart Bucket', value: 'bucket'}
+    ]);
 
     async function handleUsage({key}) {
       console.log("Fetching usage data for meter:", key)
@@ -33,9 +47,17 @@ export default function Meters() {
       navigation.navigate("Usage", {"data": snap.data()})        
     }
 
+    async function setupDevice() {
+      if (dropdownValue == "meter") {
+        await setupMeter()
+      } else if (dropdownValue == "bucket") {
+        await setupBucket()
+      }
+    }
+
     async function setupMeter() {
       try {
-        const url = `http://${deviceName}:${port}/setup?user=${firebase.auth().currentUser.uid}`
+        const url = `http://${deviceName}.local:${port}/setup?user=${firebase.auth().currentUser.uid}&section=${nickname}`
         console.log("TRYING", url)
         const response = await fetch(url)
         console.log("RESPONSE CODE", response.status)
@@ -45,6 +67,31 @@ export default function Meters() {
         console.log(error)
         Alert.alert("Pairing Failed. Please double check your device is powered on.")
       } finally {
+        setAddMeterVisible(!addMeterVisible)
+      }
+    }
+
+    async function setupBucket() {
+      try {
+        const url = `http://${deviceName}.local:${port}/setup?user=${firebase.auth().currentUser.uid}&bucket=${nickname}&base_dim=${radius}&height_dim=${height}`
+        console.log("TRYING", url)
+        const response = await fetch(url)
+        console.log("RESPONSE CODE", response.status)
+        const json = await response.json()
+        console.log("JSON", json)
+      } catch (error) {
+        console.log(error)
+        Alert.alert("Pairing Failed. Please double check your device is powered on.")
+      } finally {
+        console.log("ADDING TO FIREBASE")
+        await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .collection("buckets")
+        .doc(nickname)
+        .set({totalCapacity: (Math.pow(radius, 2)) * Math.PI * height / 231})
+      
         setAddMeterVisible(!addMeterVisible)
       }
     }
@@ -63,7 +110,7 @@ export default function Meters() {
                 console.log(documentSnapshot.data())
                 newBuckets.push({
                   key: documentSnapshot.id,
-                  currentLevel: documentSnapshot.data()['currentLevel'],
+                  currentCapacity: documentSnapshot.data()['currentCapacity'],
                   totalCapacity: documentSnapshot.data()['totalCapacity'],
                 })
               })
@@ -101,18 +148,11 @@ export default function Meters() {
     
         
     const Bucket = ({data}) => (
-      <Pressable
-        style={({ pressed }) => [
-          { backgroundColor: pressed ? 'rgb(30, 30, 30)' : 'rgb(22, 23, 24)' },
-          styles.meter_pressable
-        ]}
-        onPress={() => handleUsage(data)}>
-        
-        
+      <View style={styles.meter_pressable}>        
         <Text style={styles.text}>{data.key}</Text>
 
-        <Text style={styles.text}>{data.currentLevel} gal</Text>
-      </Pressable>
+        <Text style={styles.text}>{data.currentCapacity} gal</Text>
+      </View>
 
 
     );
@@ -147,18 +187,65 @@ export default function Meters() {
               
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
+                <Text style={styles.modalText}>Select Device Type</Text>
+
+                <DropDownPicker
+                  style={styles.dropdown}
+                  listItemContainerStyle={{backgroundColor: "rgb(220, 220, 220)"}}
+                  open={dropdownOpen}
+                  value={dropdownValue}
+                  items={dropdownItems}
+                  setOpen={setDropdownOpen}
+                  setValue={setDropdownValue}
+                  setItems={setDropdownItems}
+                />  
+
+                <View style={{display: dropdownValue == "bucket" ? "flex" : "none"}}>
+                  <Text style={styles.modalText}>Enter Tank Radius (in)</Text>
+                  <TextInput
+                    editable
+                    onChangeText={text => onChangeRadius(text)}
+                    value={radius}
+                    placeholder={'  9'}
+                    placeholderStyle={styles.modalText}
+                    style={[{width: windowWidth - 200}, styles.textInput]}
+                    textStyle={{marginLeft: 10}}
+                  />
+
+                  <Text style={styles.modalText}>Enter Tank Depth (in)</Text>
+                  <TextInput
+                    editable
+                    onChangeText={text => onChangeHeight(text)}
+                    value={height}
+                    placeholder={'  72'}
+                    style={[{width: windowWidth - 200}, styles.textInput]}
+                  />
+                </View>
+
+                <View>
+                  <Text style={styles.modalText}>Enter Device Nickname</Text>
+                  <TextInput
+                    editable
+                    onChangeText={text => onChangeNickName(text)}
+                    value={nickname}
+                    placeholder={'  Lawn'}
+                    style={[{width: windowWidth - 200}, styles.textInput]}
+                  />
+                </View>
+                
                 <Text style={styles.modalText}>Enter Device ID</Text>
                 <TextInput
                   editable
-                  onChangeText={text => onChangeText(text)}
+                  onChangeText={text => onChangeDeviceName(text)}
                   value={deviceName}
-                  style={{padding: 15, width: "100%", textDecorationLine: "underline"}}
-                />
+                  placeholder={'raspberrypi'}
+                  style={[{width: windowWidth - 200}, styles.textInput]}
+                  />
 
-                <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+                <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     style={[styles.button, styles.buttonClose]}
-                    onPress={() => setupMeter()}>
+                    onPress={() => setupDevice()}>
                     <Text style={styles.textStyle}>Add Device</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => setAddMeterVisible(!addMeterVisible)}>
