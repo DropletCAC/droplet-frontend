@@ -128,7 +128,7 @@ export default function AuthScreen() {
                 name="droplet"
                 size={60}
                 color="black"
-                style={{ padding: 5, marginHorizontal: 8 }}
+                style={{marginRight: 20 }}
               />
               <View style={{justifyContent: "center"}}>
                 <Text style={styles.headerText}>Droplet</Text>

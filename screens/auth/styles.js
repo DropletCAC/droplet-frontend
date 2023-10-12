@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "black",
     alignContent: "center",
+    padding: 20
   },
 
   headerText: {
