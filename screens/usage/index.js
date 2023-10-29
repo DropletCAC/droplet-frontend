@@ -351,7 +351,7 @@ export default function Usage({route}) {
           fromZero={true}
           withHorizontalLabels={false}
           xAxisLabel='$'
-          style={[styles.graph, {marginLeft: (dropDownValue === "today") ? (Dimensions.get("window").width / 2) + 30 : -5}]}
+          style={[styles.graph, {marginLeft: (dropDownValue === "today") ? (Dimensions.get("window").width / 2) + 30 : -35}]}
         />
 
         <Text style={{color: "white"}}>Estimated Cost Based on ${rate}/CCF</Text>

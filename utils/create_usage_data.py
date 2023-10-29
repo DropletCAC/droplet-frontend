@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore 
 import random 
 import os 
+import numpy as np 
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -102,7 +103,9 @@ month_data = {
   }
 }
 
-def generateHourlyUsage(hour):
+total_usage = {str(month): {str(day): [0] * 24 for day in range(1, 32)} for month in range(1, 13)}
+print(total_usage)
+def generateHourlyUsage(month, day, hour, divider):
     usages = {
         0:2,
         1:2,
@@ -129,18 +132,20 @@ def generateHourlyUsage(hour):
         22:3,
         23:0,
     }
-    
-    return str(max(0, usages[hour] + random.randint(-2, 2)))
+    hourly_usage = (usages[hour] + random.randint(-2, 2)) / divider
+    total_usage[str(month)][str(day)][hour] += hourly_usage
+    return str(max(0, hourly_usage))
 
-def generateDailyUsage(stop=24):
-  day = []
+def generateDailyUsage(month, day, *, stop=24, divider):
+  today = []
   for hour in range(0, stop):
-    day.append(generateHourlyUsage(hour))
-  return day
+    today.append(generateHourlyUsage(month, day, hour, divider))
+  
+  return today
 
-def generateData(stop_month, stop_day, stop_hour):
+def generateData(stop_month, stop_day, stop_hour, divider=1):
   usage_data = {}
-
+  
   for month_name in month_data:
       
       month_num = str(month_data[month_name]['number'])
@@ -151,17 +156,22 @@ def generateData(stop_month, stop_day, stop_hour):
         if (month_data[month_name]['number'] == stop_month):
           if (day == stop_day):
             day = str(day)
-            usage_data[month_num][day] = generateDailyUsage(stop=stop_hour)
+            usage_data[month_num][day] = generateDailyUsage(month_num, day, stop=stop_hour, divider=divider)
             continue
           
           if (day == stop_day + 1):
             return usage_data
           
         day = str(day)
-        usage_data[month_num][day] = generateDailyUsage()
-          
+        usage_data[month_num][day] = generateDailyUsage(month_num, day, divider=divider)
+
   return usage_data
 
+
+def createMeter(name, divider):
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document(name).set({"currentUsage": 0})
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document(name).collection("usage").document("2023").set(generateData(month, day, hour, divider))
+  
 def generateCSVData():
   data = {
   "0": "1",
@@ -199,12 +209,10 @@ if __name__ == "__main__":
   #   "currentUsage": "0",
   # })
 
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("usage").document("2023").set(generateData(month, day ,hour))  
+  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("usage").document("2023").set(generateData(month, day, hour))  
   
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("bathroom").set({"currentUsage": 0})
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("bathroom").collection("usage").document("2023").set(generateData(month, day, hour))
-  
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("lawn").set({"currentUsage": 0})
-  db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("meters").document("lawn").collection("usage").document("2023").set(generateData(month, day, hour))
-  
+  createMeter("bathroom", 6)
+  createMeter("lawn", 12)
+  createMeter("guest-house", 5)
+
   db.collection("users").document("BwyZV2GQN0O1DVDsGl4BAj9W5q92").collection("buckets").document("lawn-tank").set({"currentCapacity": 20, "totalCapacity": 40})

@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       marginTop: 20,
       marginRight: 30,
-      marginLeft: 5
+      marginLeft: 20
     },
     
     cost: {
